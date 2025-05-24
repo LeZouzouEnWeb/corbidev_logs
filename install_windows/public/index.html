@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installer Docker et Symfony</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const socket = io();
+      const logContainer = document.getElementById("log");
+
+      socket.on("consoleMessage", (message) => {
+
+
+        const regex = /\[stderr\]\s+\w+\s+Downloading/; // Regex pour capturer le modèle du message
+        const firstChild = logContainer.firstChild;
+
+        if (regex.test(message) && firstChild && regex.test(firstChild.textContent)) {
+          // Si le premier message correspond au modèle, remplace-le
+          firstChild.textContent = message;
+        } else {
+        // Sinon, ajoute un nouveau message en haut
+          const logElement = document.createElement("div");
+          logElement.textContent = message;
+          logContainer.prepend(logElement);
+        }
+      });
+
+      // Fonction pour écouter le clic sur le bouton de fermeture
+      document.getElementById("closeBtn").addEventListener("click", () => {
+        setTimeout(() => {
+          window.close();
+        }, 1000);
+      });
+    });
+
+    // Fonction pour envoyer une action au serveur
+    window.runAction = function (action) {
+      fetch(`/run-action/${action}`) // Envoie une requête au serveur
+        .then((response) => response.text())
+        .then((data) => {
+          console.log(data); // Optionnel, pour afficher la réponse dans la console du client
+        })
+        .catch((error) => {
+          console.error("Erreur lors de l'envoi de la requête:", error);
+        });
+    };
+  </script>
+
+  <style>
+    body{
+      background-color: #0a0a0a;
+      color: #a4a6a7;
+      font-family: Exo;
+    }
+    #log {
+      width: calc(45vw - 15px);
+      height: 80vh;
+      border: 1px solid #000;
+      white-space: pre-wrap;
+      overflow-y: scroll;
+      font-family: monospace;
+      margin-left: 15px;
+      background-color: #4d4d4d;
+      color: aliceblue;
+    }
+    #log div {
+      border-bottom: 1px solid #bfbfbf;
+      font-size: 13px;/* margin: 5px; */
+      padding: 5px;
+    }
+    #log div:nth-child(even) {
+      background: #5b5a3d;
+    }
+    .log, .menu{
+      max-width: 45vw;
+    }
+    .menu span{
+      text-align: right;
+      font-style: italic;
+      font-size: 14px;
+      margin-bottom: 10px;
+      margin-right: 5px;
+    }
+    .log h3{
+      text-align: center;
+    }
+
+    .container-principal{
+      display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column justify-content-center" style="align-items: center">
+  <h1>Menu d'installation</h1>
+  <div class="container-principal">
+    <div class="menu">
+      <div class="d-flex flex-column">
+        <h3>Symfony</h3>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('IS')">
+          Nouvelle Installation Symfony
+        </button>
+        <span>
+          (tout supprimer et tout recréer)
+        </span>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('TS')">
+          Installation TypeScript et Scss
+        </button>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('SE')">
+          Générer le .env
+        </button>
+        <h3>WordPress</h3>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('WP')">
+          Nouvelle Installation WordPress
+        </button>
+        <span>
+          (tout supprimer et tout recréer)
+        </span>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('WE')">
+          Générer le .env
+        </button>
+        <h3>Docker</h3>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('DKEN')">
+          Générer le .env
+        </button>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('DKCP')">
+          Créer Docker compose
+        </button>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('DKCB')" hidden>
+          Créer un nouveau Build (Docker)
+        </button>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('DKLT')">
+          Lancer Docker
+        </button>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('DKCC')" hidden>
+          Recréer les containers (compose up)
+        </button>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('DKRC')" hidden>
+          Recréer des containers avec DB reset
+        </button>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('DKRB')" hidden>
+          Rebuild (supprimer les anciennes images et recréer le Build)
+        </button>
+        <span>
+          (supprimer les anciennes images et recréer le Build)
+        </span>
+        <h3>Serveurs</h3>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('LS')">
+          Lancer le serveur Symfony
+        </button>
+        <button type="button" class="btn btn-secondary mb-1" onclick="runAction('LW')">
+          Lancer le serveur WordPress
+        </button>
+        <h3>NODE JS</h3>
+        <button id="closeBtn" type="button" class="btn btn-secondary mb-1" onclick="runAction('Q')">
+          Quitter
+        </button>
+      </div>
+      <div id="output"></div>
+    </div>
+    <div class="log">
+      <h3>Logs</h3>
+      <div id="log"></div>
+    </div>
+    </div>
+    </body>
+
+</html>

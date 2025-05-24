@@ -1,0 +1,20 @@
+{
+    "name": {
+        "project": "logs",
+        "dossier_back": "",
+        "dossier_front": "symfony",
+        "database": "database"
+    },
+    "version": {
+        "nodejs": "22",
+        "symfony": "8.2.*",
+        "php": "8.2.*",
+        "mariadb": "10.6",
+        "adminer": "4.8.1"
+    },
+    "port": {
+        "install": 3000,
+        "backend": 9900,
+        "frontend": 8000
+    }
+}
