@@ -1,20 +1,20 @@
 {
     "name": {
-        "project": "logs",
-        "dossier_back": "",
-        "dossier_front": "symfony",
+        "project": "corbidev_logs",
+        "dossier_wordpress": "wordpress",
+        "dossier_symfony": "symfony",
         "database": "database"
     },
     "version": {
-        "nodejs": "22",
+        "nodejs": "22.*",
         "symfony": "8.2.*",
-        "php": "8.2.*",
-        "mariadb": "10.6",
-        "adminer": "4.8.1"
+        "php": "8.4.*",
+        "mariadb": "11.7",
+        "adminer": "5.3.*"
     },
     "port": {
         "install": 3000,
-        "backend": 9900,
-        "frontend": 8000
+        "wordpress": 9900,
+        "symfony": 8000
     }
 }

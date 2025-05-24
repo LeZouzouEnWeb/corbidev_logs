@@ -4,9 +4,7 @@ export const createDirectoryIfNotExists = async (directoryPath: string): Promise
     try {
         await fs.promises.access(directoryPath, fs.constants.F_OK);
         const stats = await fs.promises.stat(directoryPath);
-        if (stats.isDirectory()) {
-            // console.log(`Le dossier '${directoryPath}' existe déjà.`);
-        } else {
+        if (!stats.isDirectory()) {            
             console.log(`Le chemin '${directoryPath}' existe mais ce n'est pas un dossier.`);
         }
     } catch {

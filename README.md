@@ -40,4 +40,3 @@ composer require thomaspark/bootswatch
 composer create-project roots/bedrock serveur_back
 ```
 # corbidev_install
-# corbidev_logs

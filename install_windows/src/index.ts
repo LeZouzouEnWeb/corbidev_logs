@@ -5,7 +5,7 @@ import open from 'open';
 import { installWordpress } from './functions_js/wordpress';
 import { installScssTs } from './functions_js/installScssTs';
 import { findAvailablePort, lancementServeur } from './functions_js/lancementServeur';
-import { FOLDER_REL_BASE, PORT_INSTALL, PORT_BACKEND, PORT_FRONTEND } from './functions_js/variables';
+import { FOLDER_REL_BASE, PORT_INSTALL, PORT_WORDPRESS, PORT_SYMFONY } from './functions_js/variables';
 import { createEnvBase } from './functions_js/file_env';
 import { Server } from 'socket.io';
 import { createDockerCompose, dockerManager } from './functions_js/docker';
@@ -92,11 +92,11 @@ app.get('/run-action/:action', async (req: Request, res: Response): Promise<void
 
             case 'LS':
                 console.log('Lancement du  serveur Symfony');
-                await lancementServeur("front", await PORT_FRONTEND);
+                await lancementServeur("front", await PORT_SYMFONY);
                 break;
             case 'LW':
                 console.log('Lancement du  serveur WordPress');
-                await lancementServeur("back", await PORT_BACKEND);
+                await lancementServeur("back", await PORT_WORDPRESS);
                 break;
 
 

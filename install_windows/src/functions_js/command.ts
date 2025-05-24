@@ -84,13 +84,13 @@ export function openTerminal(command: string): void {
 
     if (platform === "win32") {
         // Windows (CMD)
-        spawn("cmd.exe", ["/c", `start cmd.exe /k \"${command}\"`], { shell: true });
-        // spawn("cmd.exe", ["/c", `${command}`], { shell: true });
+        spawn("cmd.exe", ["/c", `start cmd.exe /k "${command}"`], { shell: true });
+
     } else if (platform === "darwin") {
         // macOS (Terminal)
         spawn("osascript", [
             "-e",
-            `tell application \"Terminal\" to do script \"${command}\"`
+            `tell application "Terminal" to do script "${command}"`
         ]);
     } else if (platform === "linux") {
         // Linux (GNOME Terminal)

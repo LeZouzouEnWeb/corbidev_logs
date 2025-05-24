@@ -72,7 +72,7 @@ export async function installSymfony(): Promise<void> {
 
     if (fs.existsSync(filePath)) {
         const fileContent: string = fs.readFileSync(filePath, 'utf8');
-        config = yaml.parse(fileContent) || {};
+        config = yaml.parse(fileContent) ?? {};
     } else {
         console.log(`Le fichier ${filePath} n'existe pas, un nouveau sera créé.`);
     }
@@ -90,7 +90,7 @@ export async function installSymfony(): Promise<void> {
 
     if (fs.existsSync(filePath)) {
         const fileContent: string = fs.readFileSync(filePath, 'utf8');
-        config = yaml.parse(fileContent) || {};
+        config = yaml.parse(fileContent) ?? {};
     } else {
         console.log(`Le fichier ${filePath} n'existe pas, un nouveau sera créé.`);
     }

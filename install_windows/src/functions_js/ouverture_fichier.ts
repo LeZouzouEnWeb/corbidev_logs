@@ -13,11 +13,11 @@ interface SoftwareOptions {
 }
 
 export class SoftwareManager {
-    private name: string;
-    private executableName: string;
-    private executablePath: string;
-    private downloadUrl: string;
-    private readyCommand: string | undefined;
+    private readonly name: string;
+    private readonly executableName: string;
+    private readonly executablePath: string;
+    private readonly downloadUrl: string;
+    private readonly readyCommand: string | undefined;
 
     constructor(options: SoftwareOptions) {
         this.name = options.name;

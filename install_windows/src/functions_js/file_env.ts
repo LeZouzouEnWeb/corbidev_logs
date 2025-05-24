@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid'; // Importation du générateur d'UUID
 import {
     BDD,
     FOLDER_REL_BASE,
-    FOLDER_REL_SERVER_BACK,
-    FOLDER_REL_SERVER_FRONT,
-    PORT_BACKEND
+    FOLDER_REL_SERVER_BACK as FOLDER_REL_SERVER_WORDPRESS,
+    FOLDER_REL_SERVER_FRONT as FOLDER_REL_SERVER_SYMFONY,
+    PORT_WORDPRESS
 } from './variables';
 import { createFiles } from './folder_file';
 
@@ -146,7 +146,7 @@ MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0
 
     wordpress: (securityKeys: Record<string, string>) => `
 ${commonVariables}
-HTTP_LOCALHOST_PORT=${PORT_BACKEND}
+HTTP_LOCALHOST_PORT=${PORT_WORDPRESS}
 ###< PORTS ###
 
 DB_NAME=\${NAME}
@@ -176,21 +176,23 @@ NONCE_SALT='${securityKeys.NONCE_SALT}'
 `
 };
 
+type FileType = 'data' | 'symfony' | 'wordpress';
+
 // Fonction pour générer le fichier .env
-export function createEnvBase(fileType: 'data' | 'symfony' | 'wordpress') {
-    const securityKeys = generateSecurityKeys();
-
-    let envContent = fileType === 'wordpress'
-        ? envTemplates.wordpress(securityKeys)
-        : fileType === 'symfony'
-            ? envTemplates.symfony(securityKeys)
-            : envTemplates.racine;
-
-    const targetFolder = fileType === 'wordpress'
-        ? FOLDER_REL_SERVER_BACK
-        : fileType === 'symfony'
-            ? FOLDER_REL_SERVER_FRONT
-            : FOLDER_REL_BASE;
-
+export function createEnvBase(fileType: FileType) {
+    const envContent: string =  EnvContent(fileType);
+    const targetFolder: string = TargetFolder(fileType);
     createFiles(targetFolder, '.env', envContent);
+}
+
+
+function EnvContent(fileType: FileType): string{
+    const securityKeys = generateSecurityKeys();
+    if (fileType ==='wordpress') return envTemplates.wordpress(securityKeys);
+    return (fileType === 'symfony') ? envTemplates.symfony(securityKeys) : envTemplates.racine;
+}
+
+function TargetFolder(fileType: FileType): string{
+    if (fileType ==='wordpress') return FOLDER_REL_SERVER_WORDPRESS;
+    return (fileType === 'symfony') ? FOLDER_REL_SERVER_SYMFONY : FOLDER_REL_BASE;
 }
