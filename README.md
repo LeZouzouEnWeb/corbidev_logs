@@ -2,6 +2,7 @@
 
 ## FRONT / SYNFONY
 
+
 * version 7.1.*
 ```bash
     composer create-project symfony/skeleton:7.1.* serveur_front
