@@ -8,10 +8,10 @@
 --   :CLIENT_HOST   -> hôte autorisé (ex. 'localhost' ou '%' ou '10.0.%')
 -- NB: Utilisez un compte root/admin pour exécuter ce script.
 
-SET @db_name      := ':DB_NAME';
-SET @user_name    := ':SYMFONY_USER';
-SET @user_pass    := ':SYMFONY_PASS';
-SET @client_host  := ':CLIENT_HOST';
+SET @db_name      := 'dbs14730147';
+SET @user_name    := 'symfony';
+SET @user_pass    := 'acces_denied';
+SET @client_host  := '%';
 
 SET @fq_user := CONCAT("'", @user_name, "'@'", @client_host, "'"); 
 
