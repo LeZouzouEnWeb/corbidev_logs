@@ -1,5 +1,10 @@
 # 📌 Instructions de développement — Projet Rapport/Trajet
 
+# 🛠️ Version 
+
+- PHP : 8.3
+- MariaDb : 10.*
+- Symfony/skeleton:7.0.*
 ## 🔹 Transmission des fichiers
 
 - Toujours **transmettre les fichiers en `.zip`**.
