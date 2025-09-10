@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="diagram1" name="Architecture">
+    <mxGraphModel dx="1182" dy="686" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Sources -->
+        <mxCell id="2" value="Sources (WordPress, Symfony, MacroDroid, Nginx)" style="rounded=1;fillColor=#add8e6;strokeColor=#000080;" vertex="1" parent="1">
+          <mxGeometry x="40" y="400" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- API -->
+        <mxCell id="3" value="Symfony API (Controller + Services)" style="rounded=1;fillColor=#add8e6;strokeColor=#000080;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Queue -->
+        <mxCell id="4" value="Queue (Redis/RabbitMQ)" style="rounded=1;fillColor=#f5deb3;strokeColor=#cd853f;" vertex="1" parent="1">
+          <mxGeometry x="280" y="200" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- DB -->
+        <mxCell id="5" value="MariaDB (Partitions mensuelles)" style="rounded=1;fillColor=#90ee90;strokeColor=#006400;" vertex="1" parent="1">
+          <mxGeometry x="520" y="200" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Worker -->
+        <mxCell id="6" value="Worker (Messenger Handler)" style="rounded=1;fillColor=#add8e6;strokeColor=#000080;" vertex="1" parent="1">
+          <mxGeometry x="280" y="350" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Frontend -->
+        <mxCell id="7" value="Frontend (Vue Explore / Dashboard)" style="rounded=1;fillColor=#ffb6c1;strokeColor=#dc143c;" vertex="1" parent="1">
+          <mxGeometry x="280" y="500" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows -->
+        <mxCell id="8" edge="1" parent="1" source="2" target="3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9" edge="1" parent="1" source="3" target="4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="10" edge="1" parent="1" source="4" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" edge="1" parent="1" source="4" target="6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" edge="1" parent="1" source="6" target="7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
