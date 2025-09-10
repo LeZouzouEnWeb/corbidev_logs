@@ -1,0 +1,267 @@
+openapi: 3.0.3
+info:
+  title: Journal Logs API
+  version: 0.1.0
+  description: >-
+    API pour ingérer, consulter et analyser les logs de sites et applications.
+    MVP basé sur ingestion HTTP, stockage MariaDB et endpoints de lecture/stats.
+servers:
+  - url: https://logs.example.com
+    description: Production (exemple)
+  - url: http://localhost:8080
+    description: Local (exemple)
+tags:
+  - name: ingest
+    description: Ingestion d'événements de log
+  - name: logs
+    description: Recherche et lecture des logs
+  - name: stats
+    description: Statistiques agrégées
+security:
+  - ApiKeyAuth: []
+paths:
+  /api/logs/ingest:
+    post:
+      tags: [ingest]
+      summary: Ingestion d'un événement de log
+      description: >-
+        Ingestion synchrone (202 Accepted si asynchrone via queue). L'auth se fait via une clé API par client.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogIngestRequest'
+            examples:
+              sample:
+                value:
+                  source: wordpress
+                  env: prod
+                  level: error
+                  message: DB connection timeout
+                  context:
+                    site: corbisier.fr
+                    url: /api/login
+                    userId: 123
+                  tags: ["db", "auth"]
+                  duration_ms: 240
+                  http_status: 500
+                  ts: 2025-09-03T10:27:14.123Z
+      responses:
+        '201':
+          description: Créé (ingestion directe)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogIngestResponse'
+        '202':
+          description: Accepté (ingestion asynchrone)
+        '400': { description: Requête invalide }
+        '401': { description: Non autorisé }
+        '429': { description: Rate limit dépassé }
+        '500': { description: Erreur serveur }
+
+  /api/logs:
+    get:
+      tags: [logs]
+      summary: Recherche de logs
+      parameters:
+        - in: query
+          name: source
+          schema: { type: string }
+        - in: query
+          name: env
+          schema: { $ref: '#/components/schemas/Env' }
+        - in: query
+          name: level
+          schema: { $ref: '#/components/schemas/LogLevel' }
+        - in: query
+          name: ts_from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: ts_to
+          schema: { type: string, format: date-time }
+        - in: query
+          name: q
+          description: Recherche texte (message, context)
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: per_page
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+      responses:
+        '200':
+          description: Résultats paginés
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearchResponse'
+
+  /api/logs/{id}:
+    get:
+      tags: [logs]
+      summary: Détail d'un log
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogEvent'
+        '404': { description: Introuvable }
+
+  /api/stats/volume:
+    get:
+      tags: [stats]
+      summary: Volumétrie d'événements
+      parameters:
+        - in: query
+          name: ts_from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: ts_to
+          schema: { type: string, format: date-time }
+        - in: query
+          name: granularity
+          description: Pas temporel
+          schema: { type: string, enum: [minute, hour, day] }
+        - in: query
+          name: source
+          schema: { type: string }
+        - in: query
+          name: level
+          schema: { $ref: '#/components/schemas/LogLevel' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  points:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VolumePoint'
+
+  /api/stats/top-errors:
+    get:
+      tags: [stats]
+      summary: Top messages d'erreurs
+      parameters:
+        - in: query
+          name: ts_from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: ts_to
+          schema: { type: string, format: date-time }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+        - in: query
+          name: source
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TopError'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Env:
+      type: string
+      enum: [dev, test, prod]
+    LogLevel:
+      type: string
+      enum: [trace, debug, info, notice, warning, error, critical, alert, emergency]
+    LogEvent:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        ts: { type: string, format: date-time }
+        source: { type: string }
+        env: { $ref: '#/components/schemas/Env' }
+        level: { $ref: '#/components/schemas/LogLevel' }
+        message: { type: string, maxLength: 1024 }
+        context:
+          type: object
+          additionalProperties: true
+        tags:
+          type: array
+          items: { type: string }
+        fingerprint: { type: string, minLength: 64, maxLength: 64 }
+        host: { type: string }
+        ip: { type: string, description: 'IPv4 ou IPv6' }
+        duration_ms: { type: integer }
+        http_status: { type: integer }
+        created_at: { type: string, format: date-time }
+      required: [id, ts, source, env, level, message, fingerprint, created_at]
+    LogIngestRequest:
+      type: object
+      properties:
+        ts: { type: string, format: date-time, description: 'UTC ISO-8601; défaut = now()' }
+        source: { type: string, maxLength: 100 }
+        env: { $ref: '#/components/schemas/Env' }
+        level: { $ref: '#/components/schemas/LogLevel' }
+        message: { type: string, maxLength: 1024 }
+        context: { type: object, additionalProperties: true }
+        tags: { type: array, items: { type: string } }
+        duration_ms: { type: integer }
+        http_status: { type: integer }
+        host: { type: string }
+        ip: { type: string }
+      required: [source, env, level, message]
+    LogIngestResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        fingerprint: { type: string }
+        status: { type: string, enum: [created, accepted, deduplicated] }
+    LogSearchResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/LogEvent' }
+        page: { type: integer }
+        per_page: { type: integer }
+        total: { type: integer }
+    VolumePoint:
+      type: object
+      properties:
+        ts: { type: string, format: date-time }
+        count: { type: integer }
+    TopError:
+      type: object
+      properties:
+        message: { type: string }
+        count: { type: integer }
+        fingerprint: { type: string }
+        first_seen: { type: string, format: date-time }
+        last_seen: { type: string, format: date-time }
+

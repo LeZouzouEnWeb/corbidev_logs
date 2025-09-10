@@ -1,0 +1,35 @@
+name: 🚀 Deploy to HOMOL
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy-homol:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔑 Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 🚀 Deploy to HOMOL
+        run: |
+          TARGET_DIR="/var/www/corbisier.fr/homol
+          "
+          echo "📂 Deploying to $TARGET_DIR"
+
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            set -e
+            cd /var/www/corbisier.fr/homol || exit 1
+            git fetch --all
+            git reset --hard origin/develop
+            composer install --no-dev --optimize-autoloader
+            php bin/console doctrine:migrations:migrate --no-interaction
+            php bin/console cache:clear
+          EOF
